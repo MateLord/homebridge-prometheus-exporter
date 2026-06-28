@@ -51,8 +51,8 @@ jobs:
           # Stage changed files (e.g. auto-generated services list or lockfile updates)
           git add src/generated/ package-lock.json
           
-          # Check if there are changes to commit
-          if ! git diff-index --quiet HEAD; then
+          # Check if there are staged changes to commit
+          if ! git diff --cached --quiet; then
             git commit -m "chore: automated build and generated files update [skip ci]"
             git push origin ${{ github.ref_name }}
           else
