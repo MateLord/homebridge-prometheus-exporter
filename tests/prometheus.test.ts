@@ -55,12 +55,12 @@ prefix_some_metric_total{label="Some Label"} 42 946684800000
                 new Metric('some_gauge', 20, new Date('2000-01-01 00:00:00 UTC')),
             ]),
         ).toEqual(
-            `# TYPE prefix_some_gauge gauge
+            `# TYPE prefix_another_gauge gauge
+prefix_another_gauge 30 946684800000
+
+# TYPE prefix_some_gauge gauge
 prefix_some_gauge 10 946684800000
 prefix_some_gauge 20 946684800000
-
-# TYPE prefix_another_gauge gauge
-prefix_another_gauge 30 946684800000
 `,
         )
     })

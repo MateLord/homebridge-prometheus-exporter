@@ -29,9 +29,17 @@ export class PrometheusExporterPlatform implements IndependentPlatformPlugin {
             }
         })
 
-        this.log.debug('Starting Prometheus HTTP server on port %d', this.config.port)
-
         this.httpServer = new PrometheusServer(this.config, this.log)
+
+        this.api.on('didFinishLaunching', () => {
+            this.log.debug('Finished launching %s', this.config.platform)
+            this.startHttpServer()
+            this.startHapDiscovery()
+        })
+    }
+
+    private startHttpServer(): void {
+        this.log.debug('Starting Prometheus HTTP server on port %d', this.config.port)
         serve(this.httpServer)
             .then((httpServerController) => {
                 this.log.debug('HTTP server started on port %d', this.config.port)
@@ -40,11 +48,6 @@ export class PrometheusExporterPlatform implements IndependentPlatformPlugin {
             .catch((e) => {
                 this.log.error('Failed to start Prometheus HTTP server on port %d: %o', this.config.port, e)
             })
-
-        this.api.on('didFinishLaunching', () => {
-            this.log.debug('Finished launching %s', this.config.platform)
-            this.startHapDiscovery()
-        })
     }
 
     private startHapDiscovery(): void {

@@ -14,7 +14,9 @@ export class MetricsRenderer {
 
     render(metrics: Metric[]): string {
         return (
-            Object.entries(metrics.sort().group((metric) => this.metricName(metric.name)))
+            Object.entries(
+                metrics.sort((a, b) => a.name.localeCompare(b.name)).group((metric) => this.metricName(metric.name)),
+            )
                 .map(([name, metrics]) => {
                     return [
                         `# TYPE ${name} ${name.endsWith('_total') ? 'counter' : 'gauge'}`,
@@ -110,7 +112,7 @@ export class PrometheusServer implements HttpServer {
 // From https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-exporter-prometheus/src/PrometheusSerializer.ts
 
 function escapeString(str: string) {
-    return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n')
+    return str.replaceAll('\\', '\\\\').replaceAll('\n', '\\n')
 }
 
 /**
@@ -123,7 +125,7 @@ function escapeAttributeValue(str: Metric['labels'][keyof Metric['labels']]) {
     if (typeof str !== 'string') {
         str = JSON.stringify(str)
     }
-    return escapeString(str).replace(/"/g, '\\"')
+    return escapeString(str).replaceAll('"', '\\"')
 }
 
 const invalidCharacterRegex = /[^a-z0-9_]/gi
