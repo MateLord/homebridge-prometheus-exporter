@@ -18,6 +18,13 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch }}
           fetch-depth: 0
 
+      - name: Lowercase Repository Owner
+        id: lowercase_owner
+        run: |
+          echo "owner=${OWNER,,}" >> "$GITHUB_OUTPUT"
+        env:
+          OWNER: ${{ github.repository_owner }}
+
       - name: 'Download code coverage'
         uses: actions/github-script@v9
         with:
@@ -49,8 +56,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=${{ toLower(github.repository_owner) }}
-            -Dsonar.projectKey=${{ toLower(github.repository_owner) }}_homebridge-prometheus-exporter
+            -Dsonar.organization=${{ steps.lowercase_owner.outputs.owner }}
+            -Dsonar.projectKey=${{ steps.lowercase_owner.outputs.owner }}_homebridge-prometheus-exporter
             -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
             -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }}
             -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
